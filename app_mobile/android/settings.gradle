@@ -1,0 +1,9 @@
+rootProject.name = 'productFinder'
+
+include ':app'
+include ':react-native-android-snackbar'
+project(':react-native-android-snackbar').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-android-snackbar/android')
+include ':react-native-vector-icons'
+project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
+include ':react-native-barcodescanner'
+project(':react-native-barcodescanner').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-barcodescanner/android')

@@ -36,7 +36,7 @@ export default class ProductDetailView extends Base {
         Component={ProductDetail}
         route={new ProductDetailRoute({ barcode })}
         renderLoading={this.loading}
-        renderFailuer={this.errorSnackbar}
+        renderFailure={this.errorSnack}
         forceFetch={true}
       />
     );

@@ -29,6 +29,7 @@ export default class Home extends Base {
         Component={ProductList}
         route={new ProductsRoute()}
         renderLoading={this.loading}
+        renderFailure={this.errorSnack}
       />
     );
   }

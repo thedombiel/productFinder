@@ -1,5 +1,5 @@
 {
-  "name": "graphql-wallet",
+  "name": "graphql-product-finder",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -10,13 +10,15 @@
   "author": "Dominik Biel",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^2.0.0",
     "express": "^4.14.0",
     "express-graphql": "^0.5.3",
-    "google": "^2.0.0",
-    "googleapis": "^12.0.0",
+    "google-images": "^1.0.0",
     "graphql": "^0.6.1",
     "graphql-relay": "^0.4.2",
-    "mongoose": "^4.5.5"
+    "mongoose": "^4.5.5",
+    "morgan": "^1.7.0",
+    "relay-mongodb-connection": "^2.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",

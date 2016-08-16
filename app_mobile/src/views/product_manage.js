@@ -34,7 +34,7 @@ export default class ManageProductView extends Base {
       <RootContainer
         Component={ManageProduct}
         route={new ManageProductRoute({ barcode })}
-        renderFailuer={this.errorSnackbar}
+        renderFailure={this.errorSnack}
         renderLoading={this.loading}
       />
     );

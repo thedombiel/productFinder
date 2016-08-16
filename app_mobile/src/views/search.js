@@ -65,6 +65,7 @@ export default class Search extends Component {
           Component={ProductList}
           route={new SearchRoute({ q })}
           renderLoading={this.loading}
+          renderFailure={this.errorSnack}
           renderFetched={(data, readyState) => {
               const isRefreshing = readyState.stale;
               if(!isRefreshing)

@@ -11,18 +11,19 @@ import Snackbar from 'react-native-android-snackbar';
 import { Button } from '../components';
 
 class ProductMutation extends Mutation {
+
   static fragments = {
     product: () => Relay.QL`
       fragment on Product {
-        id
+        barcode
       }
-    `
+    `,
   };
 
   getMutation(){
     return Relay.QL`
       mutation{ createProduct }
-    `;
+    `
   }
 
   getConfigs(){
@@ -50,22 +51,28 @@ class ProductMutation extends Mutation {
   getVariables(){
     const { product } = this.props;
     return {
-      name: product.name,
-      description: product.description,
-      barcode: product.barcode
+      name: this.props.name,
+      description: this.props.description,
+      barcode: this.props.product.barcode
     };
   }
 }
 
 class ManageProduct extends Component {
+
+  static contextTypes = {
+    navigator: React.PropTypes.object.isRequired
+  }
+
   constructor(props){
     super(props);
 
     this.state = {
-      product: this.props.product
+      product: this.props.store.product
     };
 
     this.changeValues = this.changeValues.bind(this);
+    this._onSuccess = this._onSuccess.bind(this);
     this.save = this.save.bind(this);
   }
 
@@ -82,16 +89,21 @@ class ManageProduct extends Component {
   }
 
   _onSuccess(){
+    const { barcode } = this.state.product;
+
     Snackbar.show('Product added corectly.', {duration: Snackbar.LONG});
+    this.context.navigator.to('productDetail', '', { barcode });
   }
 
   save(){
-    const { name, description, barcode } = this.state.product;
-    const mutation = new ProductMutation({product: {
-      name,
-      description,
-      barcode
-    }});
+    const { name, description } = this.state.product;
+    const { product } = this.props.store;
+
+    const mutation = new ProductMutation({
+        name,
+        description,
+        product
+    });
 
     Relay.Store.commitUpdate(mutation, {
       onSuccess: this._onSuccess
@@ -155,6 +167,7 @@ ManageProduct = Relay.createContainer(ManageProduct, {
           description
           image
           views
+          ${ProductMutation.getFragment('product')}    
         }
       }
     `

@@ -22,7 +22,7 @@ class ProductList extends Component {
       isLoading: false
     };
 
-    this.props.relay.onReadyStateChange = () => console.warn('Yeah');
+    // this.props.relay.onReadyStateChange = () => console.warn('Yeah');
 
     this.loadMore = this.loadMore.bind(this);
     this.renderActivityIndicator = this.renderActivityIndicator.bind(this);

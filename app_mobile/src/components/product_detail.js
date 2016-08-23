@@ -32,7 +32,7 @@ class ProductDetail extends Component {
   }
 
   renderBody(product){
-    if(product.id){
+    if(product.exist){
       return (
         <View>
           <Text><B>Name:</B> {product.name}</Text>
@@ -86,6 +86,7 @@ ProductDetail = Relay.createContainer(ProductDetail, {
           description
           image
           views
+          exist
         }
       }
     `

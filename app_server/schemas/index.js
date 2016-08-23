@@ -4,7 +4,8 @@ import {
   GraphQLSchema,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLBoolean
 } from 'graphql';
 
 import {
@@ -70,6 +71,12 @@ const ProductType = new GraphQLObjectType({
       views: {
         type: GraphQLInt,
         description: 'Amount of product views'
+      },
+      exist: {
+        type: GraphQLBoolean,
+        resolve: ({ _id }) => {
+          return _id ? true : false;
+        }
       }
     };
   },
@@ -132,9 +139,9 @@ const productMutation = mutationWithClientMutationId({
   name: 'Productmutations',
   description: 'Inserting new products, and changing existing.',
   inputFields: {
-    barcode: { type: GraphQLString },
-    name: { type: GraphQLString },
-    description: { type: GraphQLString }
+    barcode: { type: new GraphQLNonNull(GraphQLString) },
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    description: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     product: {

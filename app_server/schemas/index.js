@@ -160,6 +160,30 @@ const productMutation = mutationWithClientMutationId({
   }
 });
 
+
+const editProductMutation = mutationWithClientMutationId({
+  name: 'editProductmutations',
+  description: 'Inserting new products, and changing existing.',
+  inputFields: {
+    barcode: { type: new GraphQLNonNull(GraphQLString) },
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    description: { type: new GraphQLNonNull(GraphQLString) }
+  },
+  outputFields: {
+    product: {
+      type: ProductType,
+      resolve: (product) => {
+        return product;
+      }
+    }
+  },
+  mutateAndGetPayload({barcode, name, description}){
+    console.log('edit');
+    return Product.findOneAndUpdate({ barcode }, { name, description });
+  }
+});
+
+
 const Query = new GraphQLObjectType({
   name: 'Query',
   description: 'Root query',
@@ -179,7 +203,8 @@ const Mutation = new GraphQLObjectType({
   description: 'Product mutation',
   fields(){
     return {
-      createProduct: productMutation
+      createProduct: productMutation,
+      editProduct: editProductMutation
     };
   }
 });

@@ -7,6 +7,7 @@ import {
   ScrollView
 } from 'react-native';
 import Relay from 'react-relay';
+import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
@@ -42,32 +43,37 @@ class ProductDetail extends Component {
       );
     }
     return (
-      <TouchableOpacity onPress={() => this.onPress(product.barcode)} style={styles.column}>
-        <Icon
-          name='add'
-          color='#8D8D8D'
-          size={40}
-        />
         <Text
-          style={{textAlign: 'center'}}>
-            Product was not added yet.{'\n'}Tap do add product.
+          style={{textAlign: 'center', marginTop: 20}}>
+            Product was not added yet.
         </Text>
-      </TouchableOpacity>
     );
   }
 
   render(){
     const { product } = this.props.store;
     return (
-      <ScrollView style={styles.container}>
-        <Image
-          source={{uri: product.image}}
-          style={styles.image}
-          resizeMode='contain'
+      <View style={styles.container}>
+        <ScrollView>
+          <Image
+            source={{uri: product.image}}
+            style={styles.image}
+            resizeMode='contain'
+          />
+          <Text><B>Barcode:</B> {product.barcode}</Text>
+          {this.renderBody(product)}
+        </ScrollView>
+        <ActionButton
+          icon={
+            <Icon
+              name={product.exist ? "mode-edit" : "add"}
+              size={20}
+              color="#fff" />
+          }
+          buttonColor={ product.exist ? "#2C83D2" : "rgba(231,76,60,1)"}
+          onPress={() => this.onPress(product.barcode)}
         />
-        <Text><B>Barcode:</B> {product.barcode}</Text>
-        {this.renderBody(product)}
-      </ScrollView>
+      </View>
     );
   }
 }
@@ -96,8 +102,7 @@ ProductDetail = Relay.createContainer(ProductDetail, {
 const styles = {
   container: {
     flex: 1,
-    paddingTop: 15,
-    paddingLeft: 15
+    padding: 15
   },
   column: {
     flexDirection: 'column',
@@ -109,6 +114,10 @@ const styles = {
     height: 150,
     marginBottom: 15,
     alignSelf: 'center'
+  },
+  action: {
+    position: 'absolute',
+    bottom: 20
   }
 };
 

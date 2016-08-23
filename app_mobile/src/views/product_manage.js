@@ -10,10 +10,10 @@ class ManageProductRoute extends Route {
   }
 
   static queries = {
-    store: (Component, vars) => Relay.QL`
+    product: (Component, vars) => Relay.QL`
       query {
         store{
-          ${Component.getFragment('store', vars)}
+          ${Component.getFragment('product', vars)}
         }
       }
     `

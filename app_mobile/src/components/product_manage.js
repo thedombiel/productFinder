@@ -5,58 +5,15 @@ import {
   ScrollView,
   Image
 } from 'react-native';
-import Relay, { Mutation } from 'react-relay';
+import Relay from 'react-relay';
+import { connect } from 'react-redux';
+import { reduxForm } from 'redux-form';
 import Snackbar from 'react-native-android-snackbar';
 
+import { ProductMutation } from '../mutation';
 import { Button } from '../components';
+import { load } from '../actions';
 
-class ProductMutation extends Mutation {
-
-  static fragments = {
-    product: () => Relay.QL`
-      fragment on Product {
-        barcode
-      }
-    `,
-  };
-
-  getMutation(){
-    return Relay.QL`
-      mutation{ createProduct }
-    `
-  }
-
-  getConfigs(){
-    return [
-      {
-        type: 'FIELDS_CHANGE',
-        fieldIDs: {
-          product: this.props.product.id
-        }
-      }
-    ]
-  }
-
-  getFatQuery(){
-    return Relay.QL`
-      fragment on ProductmutationsPayload {
-        product {
-          id
-          views
-        }
-      }
-    `
-  }
-
-  getVariables(){
-    const { product } = this.props;
-    return {
-      name: this.props.name,
-      description: this.props.description,
-      barcode: this.props.product.barcode
-    };
-  }
-}
 
 class ManageProduct extends Component {
 
@@ -67,42 +24,26 @@ class ManageProduct extends Component {
   constructor(props){
     super(props);
 
-    this.state = {
-      product: this.props.store.product
-    };
+    this.props.load(this.props.product.product); // load from relay to reduxForm
 
-    this.changeValues = this.changeValues.bind(this);
     this._onSuccess = this._onSuccess.bind(this);
     this.save = this.save.bind(this);
   }
 
-  componentWillReceiveProps(nextProps){
-    if(nextProps !== this.props){
-      this.setState({product: nextProps.product});
-    }
-  }
-
-  changeValues(objectValue){
-    this.setState({
-      product: Object.assign({}, this.state.product, objectValue)
-    });
-  }
-
   _onSuccess(){
-    const { barcode } = this.state.product;
+    const { barcode, exist } = this.props.product.product;
+    const text = `Product ${exist ? 'changed' : 'added'} corectly.`;
 
-    Snackbar.show('Product added corectly.', {duration: Snackbar.LONG});
+    Snackbar.show(text, {duration: Snackbar.LONG});
     this.context.navigator.to('productDetail', '', { barcode });
   }
 
-  save(){
-    const { name, description } = this.state.product;
-    const { product } = this.props.store;
+  save(props){
+    const { product } = this.props.product;
 
     const mutation = new ProductMutation({
-        name,
-        description,
-        product
+      ...props,
+      product
     });
 
     Relay.Store.commitUpdate(mutation, {
@@ -111,7 +52,8 @@ class ManageProduct extends Component {
   }
 
   render(){
-    const { product } = this.props.store;
+    const { fields: { name, description }, handleSubmit } = this.props;
+    const { product } = this.props.product;
     return (
       <ScrollView style={styles.container}>
         <Image
@@ -127,17 +69,15 @@ class ManageProduct extends Component {
         />
         <TextInput
           placeholder={'Name'}
-          value={product.name}
-          onChangeText={(value) => this.changeValues({name: value})}
           placeholderTextColor={'#BCBDBE'}
+          {...name}
           style={styles.input}
         />
         <TextInput
+          {...description}
           placeholder={'Description...'}
-          value={product.description}
           multiline={true}
           numberOfLine={4}
-          onChangeText={(value) => this.changeValues({description: value})}
           placeholderTextColor={'#BCBDBE'}
           style={[styles.input, {height: 138, paddingTop: -80}]}
         />
@@ -145,7 +85,7 @@ class ManageProduct extends Component {
           <Button
             text='Save'
             color='green'
-            onPress={this.save}
+            onPress={handleSubmit(this.save)}
           />
         </View>
       </ScrollView>
@@ -153,12 +93,36 @@ class ManageProduct extends Component {
   }
 }
 
+const validate = (values) => {
+  let errors = {};
+
+  if(!values.name){
+    errors.name = 'Enter a name';
+  }
+  if(!values.description){
+    errors.description = 'Enter a description';
+  }
+  return errors;
+};
+
+
+ManageProduct = reduxForm({
+  form: 'ManageProduct',
+  fields: ['name', 'description'],
+  validate
+})(ManageProduct);
+
+const mapStateToProps = ({ product }) => ({ initialValues: product });
+
+ManageProduct = connect(mapStateToProps, { load })(ManageProduct);
+
 ManageProduct = Relay.createContainer(ManageProduct, {
   initialVariables: {
     barcode: ''
   },
   fragments: {
-    store: () => Relay.QL`
+    // conflict props with redux store
+    product: () => Relay.QL`
       fragment on Store {
         product(barcode: $barcode){
           id
@@ -167,7 +131,8 @@ ManageProduct = Relay.createContainer(ManageProduct, {
           description
           image
           views
-          ${ProductMutation.getFragment('product')}    
+          exist
+          ${ProductMutation.getFragment('product')}
         }
       }
     `
